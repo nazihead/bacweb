@@ -95,6 +95,19 @@
                 </template>
                 </el-table-column>
             </el-table>
+            <el-row>
+                <el-col :span="24">
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="pageNo"
+                        :page-sizes="[5, 10, 15]"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total">
+                    </el-pagination>
+                </el-col>
+            </el-row>
         </div>
         <DialogForm ref='dialogForm' @propssubmit='submit'/>
     </div>
@@ -102,6 +115,7 @@
 <script>
 import moment from 'moment'
 import DialogForm from '../components/DialogForm'
+
 export default {
   name: "productshow",
   data(){
@@ -116,14 +130,26 @@ export default {
             expend: '',
             describe:''
             },
+            pageNo:1,
+            pageSize:10,
+            total:0,
+           type:'add',
         }
   },
-  type:'add',
+  computed:{
 
+  },
   components:{
       DialogForm
   },
   methods:{
+       handleSizeChange(val) {
+            this.getProducts(1,val)
+        },
+          // 显示第几页
+        handleCurrentChange(val) {
+            this.getProducts(val, this.pageSize)
+        },
       selectData(){
           console.log('12313',moment(this.value1[0]).format("X"))
       },
@@ -201,7 +227,6 @@ export default {
           
       },
       handleDelete(index,item){
-          console.log(1224,index,item) 
            this.$axios.delete(`api/profile/deleteprofile/${item._id}`)
             .then(
                 res=>{
@@ -226,15 +251,15 @@ export default {
 
       },
       
-      getProducts(){
-          this.$axios.get('api/profile')
+      getProducts(index,size){
+          this.$axios.get(`api/profile/?pageNo=${index}&pageSize=${size}`)
             .then(
                 res=>{
-                    if(res.data.length){
-                            let tempdata = res.data
-                            this.tableData=tempdata
-                    }
-                    
+                        let tempdata = res.data
+                        this.pageSize=size
+                        this.pageNo=index
+                        this.tableData=tempdata.profile
+                        this.total=tempdata.total
                 }
             ).catch(err=>{
                 console.log('err',err)
@@ -245,7 +270,30 @@ export default {
       }
   },
   mounted(){
-      this.getProducts()
+      this.getProducts(1,this.pageSize)
+    //   for(let i=1;i<100;i++){
+    //       setTimeout(()=>{
+    //           this.count+=1
+    //           console.log(i)
+    //        this.$axios.post('api/profile/addprofile',{
+    //             type: '消费券',
+    //             cash: '1000',
+    //             remark: '',
+    //             income: '' + (i*10 +1000),
+    //             expend: '1000',
+    //             describe:''
+    //        })
+    //         .then(
+    //             res=>{
+    //                 if(res.data){
+    //                 }
+                    
+    //             }
+    //         ).catch(err=>{
+    //             console.log('err',err)
+    //         })
+    //   },1000)
+    //   }
   }
 };
 </script>
@@ -268,6 +316,6 @@ export default {
 }
 .table{
     width: 100%;
-    height: 100%;
+    height: 60%;
 }
 </style>

@@ -9,17 +9,44 @@ const moment = require('moment')
 
 //获取用户资金信息
 router.get('/',(req,res)=>{
-    Profile.find()
-    .then(profile=>{
-
-        res.json(profile)
-    })
-    .catch(err=>{
+    const {pageNo,pageSize} = req.query
+    if(!pageNo){
+        res.status(400).json({
+            msg:'请传入pageNo'
+        })
+    }
+    if(!pageSize){
+        res.status(400).json({
+            msg:'请传入pageSize'
+        })
+    }
+    Profile.countDocuments()
+    .then(count=>{
+        let skip = (pageNo-1)*pageSize
+        let limit = pageSize*1
+        if(Object.is(skip,NaN) || Object.is(limit,NaN)){
+            res.status(400).json({
+                msg:'出错了'
+            })
+            return
+        }
+        Profile.find().skip(skip).limit(limit) .sort({ 'created': -1 })
+        .then(profile=>{
+            res.json({profile,total:count,pageNo,pageSize})
+        })
+        .catch(err=>{
+            res.status(400).json({
+                err:err,
+                msg:'出错了'
+            })
+        })
+    }).catch(err=>{
         res.status(400).json({
             err:err,
             msg:'出错了'
         })
     })
+    
 })
 //获取单条资金信息
 router.get('/:id',(req,res)=>{

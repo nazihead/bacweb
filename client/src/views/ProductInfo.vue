@@ -69,6 +69,7 @@ export default {
         }
     },
     mounted(){
+        console.log('LocaData',LocaData)
         this.init()
        this.$axios.get(`api/profile/${this.$route.params.id}`)
         .then(
