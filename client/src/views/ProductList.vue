@@ -184,10 +184,10 @@ export default {
                             let tempdata = res.data
                             this.$refs.dialogForm.closeForm()
                             this.$message("编辑成功");
-                            setTimeout(()=>{
+                            $this.$nextTick()
+                            .then(
                                 this.tableData.unshift(tempdata)
-                                
-                            },100)
+                            )
                     }
                     
                 }
@@ -266,7 +266,7 @@ export default {
             })
       },
       formatTime(row){
-          return moment(parseInt(row.date)).format('YYYY/MM/DD hh:mm:ss')
+          return moment(parseInt(row.date)).format('YYYY/MM/DD HH:mm:ss')
       }
   },
   mounted(){

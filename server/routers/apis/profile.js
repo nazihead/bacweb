@@ -30,7 +30,7 @@ router.get('/',(req,res)=>{
             })
             return
         }
-        Profile.find().skip(skip).limit(limit) .sort({ 'created': -1 })
+        Profile.find().skip(skip).limit(limit) .sort({ 'date': -1 })
         .then(profile=>{
             res.json({profile,total:count,pageNo,pageSize})
         })
